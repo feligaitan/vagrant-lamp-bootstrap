@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Use single quotes instead of double quotes to make it work with special-character passwords
+PASSWORD='12345678'
 PROJECTFOLDER=''
 
 # create project folder
@@ -13,6 +14,12 @@ sudo apt-get -y upgrade
 # install apache 2.5 and php 5.5
 sudo apt-get install -y apache2
 sudo apt-get install -y php5
+
+# install mysql and give password to installer
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $PASSWORD"
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $PASSWORD"
+sudo apt-get -y install mysql-server
+sudo apt-get install php5-mysql
 
 # setup hosts file
 VHOST=$(cat <<EOF
@@ -32,6 +39,13 @@ sudo a2enmod rewrite
 
 # restart apache
 service apache2 restart
+
+# install git
+sudo apt-get -y install git
+
+# install Composer
+curl -s https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
 
 # cleanup
 sudo apt-get -y autoremove
